@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>community detection</title>
+		<link href="https://www.google.com/images/branding/product/ico/googleg_lodp.ico" rel="shortcut icon">
+		<link rel="stylesheet" href="./css/style.css">
+	</head>
+	<body>
+		<div class="body">
+			<header class="page-header">
+				<h1><i>Community Detection</i></h1>
+			</header>
+			<article class="params">
+				<section class="params-body">
+					<h1 class="params-header">参数设置</h1>
+					<form class="params-form">
+						<div class="params-item">
+							<label><b>数据集: </b></label>
+							<input type="radio" /> 默认
+							<select>
+								<option value="0" selected>随机生成</option>
+								<option value="1">微博</option>
+								<option value="2">脸书</option>
+							</select>
+							&nbsp;&nbsp;
+							<input type="radio" /> 自定义
+							<button class="file-btn">
+								<input type="file" name="dataset"/>
+								选择文件
+							</button>
+						</div>
+						<div class="params-item">
+							<label><b>算法: </b></label>
+							<select>
+								<option value="0" selected>GCE</option>
+							</select>
+							&nbsp;&nbsp;
+							k: <input class="input-num" type="number" value="3" placeholder="最小派系节点数..." name="gce_k"/>
+							&nbsp;&nbsp;
+							alpha: <input class="input-num" type="text" value="1" placeholder="社团评价函数参数alpha..." name="gce_alpha"/>
+							&nbsp;&nbsp;
+							e: <input class="input-num" type="text" value="0.75" placeholder="社团重叠参数e..." name="gce_e"/>
+						</div>
+						<button class="params-submit" onclick="javascript:return false;">确定</button>
+					</form>
+				</section>
+			</article>
+			<article class="content">
+				<section class="graph">
+					<h1>原始图形</h1>
+					<svg></svg>
+				</section>
+				<section class="graph">
+					<h1>GCE生成图形</h1>
+					<svg></svg>
+				</section>
+			</article>
+		</div>
+		<footer class="page-footer">
+			&copy;copyright 农春崯 and 皇甫
+		</footer>
+	</body>
+	<script src="./plugins/jQuery/jquery-3.1.1.js"></script>
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script>
+		$(function(){
+				$(".params-submit").click(function(){
+					$(".body").addClass("in");
+			});
+		});
+	</script>
+</html>

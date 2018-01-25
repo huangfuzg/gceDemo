@@ -1,0 +1,133 @@
+body
+{
+	box-sizing: border-box;
+	font-size: 14px;
+	padding: 0;
+	margin: 0;
+	background-color: rgb(23,44,60);
+	color: white;
+}
+.body
+{
+	font-size: 18px;
+	padding: 300px 50px;
+	text-align: center;
+	transition: 1s;
+}
+.body.in
+{
+	font-size: 14px;
+	padding: 0;
+	text-align: left;
+}
+.body>.params
+{
+	box-shadow: 0 0 8px rgb(30,50,64);
+	border-radius: 3px; 
+	padding: 20px 60px;
+	background: rgb(39,72,68);
+	width: 400px; 
+	margin:auto;
+	transition: 1s;
+}
+.body.in>.params
+{
+	text-align: center;
+	border-radius: 0px; 
+	padding: 10px 20px;
+	width: 100%;
+	transition: 1s; 
+}
+.file-btn
+{
+	width: 80px;
+	height: 30px;
+	background-color: #009900;
+	position: relative;
+	color: white;
+	border: 1px solid #007700; 
+	border-radius: 3px;
+}
+.file-btn>input
+{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	left: 0;
+	top: 0;
+}
+.input-num
+{
+	width: 3.0em;
+}
+.body .params-submit
+{
+	width: 80%;
+	margin: 10px 0;
+	line-height: 2.0em;
+	background-color: #009900;
+	border: 1px solid #007700; 
+	color: white;
+	font-size: 1.1em;
+	border-radius: 3px;
+}
+.body.in .params-submit
+{
+	width: 60px;
+	height: 30px;
+	vertical-align: middle;
+	margin: 0 30px;
+	display: inline-block;
+}
+.params-form
+{
+	width: 100%;
+}
+.body .params-item
+{
+	text-align: left;
+	margin-bottom: 0.8em;
+}
+.body.in .params-item
+{
+	text-align: left;
+	margin-bottom: 0;
+	display: inline-block;
+}
+.body.in .params-item+.params-item
+{
+	margin-left: 30px; 
+}
+.body.in .params-header
+{
+	display: none;
+}
+.page-footer
+{
+	margin-top: 10px;
+	text-align: center;
+	width: 100%;
+	padding: 10px;
+	background-color: rgb(39,72,68);
+}
+.body .content
+{
+	display: none;
+}
+.body.in .content
+{
+	display: block;
+	margin-top: 10px;	
+	text-align: center;	
+}
+.body.in .graph
+{
+	width: 45%;
+	background-color: rgb(32,32,32);
+	text-align: center;
+	display: inline-block;
+	height: 800px;
+	padding: 0 10px;
+	box-shadow: 0 0 8px rgb(30,50,64);
+}
