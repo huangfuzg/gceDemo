@@ -13,32 +13,38 @@
 			<article class="params">
 				<section class="params-body">
 					<h1 class="params-header">参数设置</h1>
-					<form class="params-form">
+					<form id="params-form" class="params-form" name="params_form" novalidate="true">
 						<div class="params-item">
 							<label><b>数据集: </b></label>
-							<input type="radio" /> 默认
-							<select>
-								<option value="0" selected>随机生成</option>
-								<option value="1">微博</option>
-								<option value="2">脸书</option>
-							</select>
+							<span class="radio-moren">
+								<input type="radio" name="dataset_source" value="0" checked/> 默认
+								<select name="dataset_type">
+									<option value="0" selected>随机生成</option>
+									<option value="1">微博</option>
+									<option value="2">脸书</option>
+								</select>
+							</span>
 							&nbsp;&nbsp;
-							<input type="radio" /> 自定义
-							<button class="file-btn">
-								<input type="file" name="dataset"/>
-								选择文件
-							</button>
+							<span class="radio-hand">
+								<input type="radio" name="dataset_source" value="1" /> 自定义
+								<button class="file-btn">
+									<input type="file" name="dataset"/>
+									<input type="hidden" name="file_data"/>
+									选择文件
+								</button>
+							</span>
 						</div>
 						<div class="params-item">
 							<label><b>算法: </b></label>
-							<select>
+							<select name="algorithm" class="full-select">
 								<option value="0" selected>GCE</option>
 							</select>
-							&nbsp;&nbsp;
-							k: <input class="input-num" type="number" value="3" placeholder="最小派系节点数..." name="gce_k"/>
-							&nbsp;&nbsp;
+						</div>
+						<div class="params-item">
+							<label><b>算法参数: </b></label>
+							k: <input class="input-num" type="text" value="3" placeholder="最小种子节点数..." name="gce_k"/>
 							alpha: <input class="input-num" type="text" value="1" placeholder="社团评价函数参数alpha..." name="gce_alpha"/>
-							&nbsp;&nbsp;
+							seed_e: <input class="input-num" type="text" value="0.6" placeholder="种子重叠参数seed_e..." name="gce_seed_e"/>
 							e: <input class="input-num" type="text" value="0.75" placeholder="社团重叠参数e..." name="gce_e"/>
 						</div>
 						<button class="params-submit" onclick="javascript:return false;">确定</button>
@@ -48,11 +54,11 @@
 			<article class="content">
 				<section class="graph">
 					<h1>原始图形</h1>
-					<svg></svg>
+					<svg id="original-graph"></svg>
 				</section>
 				<section class="graph">
 					<h1>GCE生成图形</h1>
-					<svg></svg>
+					<svg id="general_graph"></svg>
 				</section>
 			</article>
 		</div>
@@ -61,11 +67,103 @@
 		</footer>
 	</body>
 	<script src="./plugins/jQuery/jquery-3.1.1.js"></script>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+	<script src="config.js"></script>
+	<script src="./plugins/jquery_info.js"></script>
+	<script src="./plugins/jquery_log.js"></script>
 	<script>
 		$(function(){
-				$(".params-submit").click(function(){
-					$(".body").addClass("in");
+			let $form = $("#params-form");
+			//单选框特效
+			let $form_radio = $form.find("input[name='dataset_source']");
+			$form_radio.parent().addClass("nochecked");
+			$form_radio.parent().find("input:not([type='radio'])").attr("disabled","true");
+			$form_radio.parent().find("select").attr("disabled","true");
+			let $check_radio = $form.find("input[name='dataset_source']:checked");
+			$check_radio.parent().removeClass("nochecked");
+			$check_radio.parent().find("input:not([type='radio'])").prop("disabled",false);
+			$check_radio.parent().find("select").prop("disabled",false);
+			$form_radio.change(function(){
+				let $check_radio = $(this);
+				$form_radio.parent().addClass("nochecked");
+				$form_radio.parent().find("input:not([type='radio'])").attr("disabled","true");
+				$form_radio.parent().find("select").attr("disabled","true");
+				$check_radio.parent().removeClass("nochecked");
+				$check_radio.parent().find("input:not([type='radio'])").prop("disabled",false);
+				let $file_input = $check_radio.parent().find("button");
+				// console.log($file_input);
+				let $select = $check_radio.parent().find("select").prop("disabled",false);
+				if($select.length == 1)
+				{
+					$.mylog.log($select,'选择系统示例数据集',"info",true,2000);
+				}
+				else if($file_input.length == 1)
+				{
+					$.mylog.log($file_input,'点击此处上传数据集',"info",true,2000);
+				}
+			});
+			//表单控件
+			let $algorithm = $form.find("select[name='algorithm']");
+			let $gce_k = $form.find("input[name='gce_k']");
+			let $gce_alpha = $form.find("input[name='gce_alpha']");
+			let $gce_e = $form.find("input[name='gce_e']");
+			let $gce_seed_e = $form.find("input[name='gce_seed_e']");
+			//提示特效
+			$algorithm.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($algorithm,'选择社团发现算法',"info",true,1000);
+			});
+			$gce_k.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($gce_k,'最小派系节点数',"info",true,1000);
+			});
+			$gce_alpha.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($gce_alpha,'社团评价函数参数alpha',"info",true,1000);
+			});
+			$gce_e.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($gce_e,'社团重叠参数',"info",true,1000);
+			});
+			$gce_seed_e.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($gce_seed_e,'社团重叠参数',"info",true,1000);
+			});
+			//表单验证
+			$(".params-submit").click(function(){
+				let dataset_type = $form_radio.val();
+				let algorithm = $algorithm.val();
+				let gce_k = $gce_k.val();
+				let gce_alpha = $gce_alpha.val();
+				let gce_e = $gce_e.val();
+				let gce_seed_e = $gce_seed_e.val();
+				let algorithm_params = [gce_k,gce_alpha,gce_e];
+				if(dataset_type == 0)
+				{
+					if(Object.is(+gce_k,0))
+					{
+						$.mylog.log($gce_k,'必须输入一个数字',"danger",true,1000);
+						return false;
+					}
+					if(Object.is(+gce_alpha,NaN))
+					{
+						$.mylog.log($gce_alpha,'必须输入一个数字',"danger",true,1000);
+						return false;
+					}
+					if(Object.is(+gce_e,NaN))
+					{
+						$.mylog.log($gce_e,'必须输入一个数字',"danger",true,1000);
+						return false;
+					}
+					if(Object.is(+gce_seed_e,NaN))
+					{
+						$.mylog.log($gce_seed_e,'必须输入一个数字',"danger",true,1000);
+						return false;
+					}
+					let data = {"algorithm":algorithm, "data_type":dataset_type,"algorithm_params":[+gce_k,+gce_seed_e,+gce_alpha,+gce_e]};
+					//请求数据的代码
+				}
+				$(".body").addClass("in");
 			});
 		});
 	</script>

@@ -10,7 +10,7 @@ body
 .body
 {
 	font-size: 18px;
-	padding: 300px 50px;
+	padding: 277px 50px;
 	text-align: center;
 	transition: 1s;
 }
@@ -26,9 +26,10 @@ body
 	border-radius: 3px; 
 	padding: 20px 60px;
 	background: rgb(39,72,68);
-	width: 400px; 
+	width: 450px; 
 	margin:auto;
 	transition: 1s;
+	text-align: center;
 }
 .body.in>.params
 {
@@ -37,6 +38,10 @@ body
 	padding: 10px 20px;
 	width: 100%;
 	transition: 1s; 
+}
+.body.in>.params .radio-hand
+{
+	float: right;
 }
 .file-btn
 {
@@ -63,7 +68,7 @@ body
 }
 .body .params-submit
 {
-	width: 80%;
+	width: 75%;
 	margin: 10px 0;
 	line-height: 2.0em;
 	background-color: #009900;
@@ -97,7 +102,7 @@ body
 }
 .body.in .params-item+.params-item
 {
-	margin-left: 30px; 
+	margin-left: 100px; 
 }
 .body.in .params-header
 {
@@ -127,7 +132,53 @@ body
 	background-color: rgb(32,32,32);
 	text-align: center;
 	display: inline-block;
-	height: 800px;
+	height: 772px;
 	padding: 0 10px;
 	box-shadow: 0 0 8px rgb(30,50,64);
+}
+input,select
+{
+	border: 1px solid #ccc;
+	border-radius: 3px;
+    padding: 2px;
+}
+input.info
+{`
+	border: 1px solid #5cd3d9;
+	transition: 0.5s; 
+}
+input.warning
+{
+	border: 1px solid #ebe412;
+	transition: 0.5s; 
+}
+input.dange
+{
+	border: 1px solid red;
+	transition: 0.5s; 
+}
+.nochecked
+{
+	color: #999;
+}
+.nochecked button
+{
+	color: #999;
+	cursor: disabled;
+}
+.body .full-select
+{
+	width: 400px;
+}
+.body .radio-hand
+{
+	float: right;
+}
+.body.in .full-select
+{
+	width: auto;
+}
+.body.in .radio-hand
+{
+	float: none;
 }
