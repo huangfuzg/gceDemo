@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>community detection</title>
 		<link href="https://www.google.com/images/branding/product/ico/googleg_lodp.ico" rel="shortcut icon">
 		<link rel="stylesheet" href="./css/style.css">
@@ -161,7 +162,22 @@
 						return false;
 					}
 					let data = {"algorithm":algorithm, "data_type":dataset_type,"algorithm_params":[+gce_k,+gce_seed_e,+gce_alpha,+gce_e]};
-					//请求数据的代码
+					let settings = {
+					  "async": true,
+					  "crossDomain": true,
+					  "url": "http://192.168.30.61:8080/gceDem/getDataServlet",
+					  "method": "POST",
+					  "headers": {
+						"Content-Type": "application/json",
+						"Cache-Control": "no-cache",
+					  },
+					  "processData": false,
+					  "data": JSON.stringify(data)
+					}
+
+					$.ajax(settings).done(function (response) {
+					  console.log(response);
+					});
 				}
 				$(".body").addClass("in");
 			});
