@@ -15,51 +15,66 @@
 				<section class="params-body">
 					<h1 class="params-header">参数设置</h1>
 					<form id="params-form" class="params-form" name="params_form" novalidate="true">
-						<div class="params-item">
-							<label><b>数据集: </b></label>
-							<span class="radio-moren">
-								<input type="radio" name="dataset_source" value="0" checked/> 默认
-								<select name="dataset_type">
-									<option value="0" selected>随机生成</option>
-									<option value="1">微博</option>
-									<option value="2">脸书</option>
+						<div class="params-items">
+							<div class="params-item">
+								<label><b>数据集: </b></label>
+								<span class="radio-moren">
+									<input type="radio" name="dataset_source" value="0" checked/> 默认
+									<select name="dataset_type">
+										<option value="0" selected>LFR基准</option>
+										<option value="1">微博</option>
+										<option value="2">脸书</option>
+									</select>
+								</span>
+								&nbsp;&nbsp;
+								<span class="radio-hand">
+									<input type="radio" name="dataset_source" value="1" /> 自定义
+									<button class="file-btn">
+										<input type="file" name="dataset"/>
+										<input type="hidden" name="file_data"/>
+										选择文件
+									</button>
+								</span>
+							</div>
+							<div id="lfr_params" class="params-item collapse in">
+								<label><b>LFR参数: </b></label>
+								节点数: <input class="input-num" type="text" value="500" placeholder="节点数..." name="lfr_nodes"/>
+								平均度: <input class="input-num" type="text" value="8" placeholder="节点平均度..." name="lfr_ave_de"/>
+								最大度: <input class="input-num" type="text" value="40" placeholder="节点最大度..." name="lfr_max_de"/>
+								度分布: <input class="input-num" type="text" value="2" placeholder="节点度分布指数..." name="lfr_node_di"/>
+								社团分布: <input class="input-num" type="text" value="1" placeholder="社团大小分布指数..." name="lfr_com_di"/>
+								混合指数 : <input class="input-num" type="text" value="0.2" placeholder="社团混合参数..." name="lfr_mix_param"/>
+							</div>
+							<button id="dataset_btn" class="params-submit" onclick="javascript:return false;">加载数据</button>
+						</div>
+						<div class="params-items">
+							<div class="params-item">
+								<label><b>算法: </b></label>
+								<select name="algorithm" class="full-select">
+									<option value="0" selected>GCE</option>
 								</select>
-							</span>
-							&nbsp;&nbsp;
-							<span class="radio-hand">
-								<input type="radio" name="dataset_source" value="1" /> 自定义
-								<button class="file-btn">
-									<input type="file" name="dataset"/>
-									<input type="hidden" name="file_data"/>
-									选择文件
-								</button>
-							</span>
+							</div>
+							<div id="gce_params" class="params-item collapse in">
+								<label><b>算法参数: </b></label>
+								k: <input class="input-num" type="text" value="3" placeholder="最小种子节点数..." name="gce_k"/>
+								alpha: <input class="input-num" type="text" value="1" placeholder="社团评价函数参数alpha..." name="gce_alpha"/>
+								seed_e: <input class="input-num" type="text" value="0.6" placeholder="种子重叠参数seed_e..." name="gce_seed_e"/>
+								e: <input class="input-num" type="text" value="0.75" placeholder="社团重叠参数e..." name="gce_e"/>
+							</div>
+							<button id="algorithm_btn" class="params-submit" onclick="javascript:return false;">算法分析</button>
 						</div>
-						<div class="params-item">
-							<label><b>算法: </b></label>
-							<select name="algorithm" class="full-select">
-								<option value="0" selected>GCE</option>
-							</select>
-						</div>
-						<div class="params-item">
-							<label><b>算法参数: </b></label>
-							k: <input class="input-num" type="text" value="3" placeholder="最小种子节点数..." name="gce_k"/>
-							alpha: <input class="input-num" type="text" value="1" placeholder="社团评价函数参数alpha..." name="gce_alpha"/>
-							seed_e: <input class="input-num" type="text" value="0.6" placeholder="种子重叠参数seed_e..." name="gce_seed_e"/>
-							e: <input class="input-num" type="text" value="0.75" placeholder="社团重叠参数e..." name="gce_e"/>
-						</div>
-						<button class="params-submit" onclick="javascript:return false;">确定</button>
+						<button id="start_btn" class="params-submit" onclick="javascript:return false;">确定</button>
 					</form>
 				</section>
 			</article>
 			<article class="content">
-				<section class="graph">
+				<section class="graph" style="height: 800px">
 					<h1>原始图形</h1>
-					<svg id="original-graph"></svg>
+					<svg id="original_graph" style="width: 100%; height: 100%;"></svg>
 				</section>
-				<section class="graph">
+				<section class="graph" style="height: 800px">
 					<h1>GCE生成图形</h1>
-					<svg id="general_graph"></svg>
+					<svg id="general_graph" style="width: 100%; height: 100%;"></svg>
 				</section>
 			</article>
 		</div>
@@ -68,15 +83,17 @@
 		</footer>
 	</body>
 	<script src="./plugins/jQuery/jquery-3.1.1.js"></script>
-	<!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+	<script src="https://d3js.org/d3.v4.min.js"></script>
 	<script src="config.js"></script>
 	<script src="./plugins/jquery_info.js"></script>
 	<script src="./plugins/jquery_log.js"></script>
+	<script src="./js/draw-graph.js"></script>
 	<script>
 		$(function(){
 			let $form = $("#params-form");
 			//单选框特效
 			let $form_radio = $form.find("input[name='dataset_source']");
+			let $dataset_select = $form.find("select[name='dataset_type']");
 			$form_radio.parent().addClass("nochecked");
 			$form_radio.parent().find("input:not([type='radio'])").attr("disabled","true");
 			$form_radio.parent().find("select").attr("disabled","true");
@@ -84,7 +101,7 @@
 			$check_radio.parent().removeClass("nochecked");
 			$check_radio.parent().find("input:not([type='radio'])").prop("disabled",false);
 			$check_radio.parent().find("select").prop("disabled",false);
-			$form_radio.change(function(){
+			$form_radio.change(function(event){
 				let $check_radio = $(this);
 				$form_radio.parent().addClass("nochecked");
 				$form_radio.parent().find("input:not([type='radio'])").attr("disabled","true");
@@ -96,10 +113,15 @@
 				let $select = $check_radio.parent().find("select").prop("disabled",false);
 				if($select.length == 1)
 				{
+					if($dataset_select.val() == 0)
+					{
+						$("#lfr_params").addClass("in");
+					}
 					$.mylog.log($select,'选择系统示例数据集',"info",true,2000);
 				}
 				else if($file_input.length == 1)
 				{
+					$("#lfr_params").removeClass("in");
 					$.mylog.log($file_input,'点击此处上传数据集',"info",true,2000);
 				}
 			});
@@ -109,6 +131,12 @@
 			let $gce_alpha = $form.find("input[name='gce_alpha']");
 			let $gce_e = $form.find("input[name='gce_e']");
 			let $gce_seed_e = $form.find("input[name='gce_seed_e']");
+			let $lfr_nodes = $form.find("input[name='lfr_nodes']");
+			let $lfr_ave_de = $form.find("input[name='lfr_ave_de']");
+			let $lfr_max_de = $form.find("input[name='lfr_max_de']");
+			let $lfr_node_di = $form.find("input[name='lfr_node_di']");
+			let $lfr_com_di = $form.find("input[name='lfr_com_di']");
+			let $lfr_mix_param = $form.find("input[name='lfr_mix_param']");
 			//提示特效
 			$algorithm.focus(function(event) {
 				/* Act on the event */
@@ -128,19 +156,67 @@
 			});
 			$gce_seed_e.focus(function(event) {
 				/* Act on the event */
-				$.mylog.log($gce_seed_e,'社团重叠参数',"info",true,1000);
+				$.mylog.log($gce_seed_e,'种子重叠参数',"info",true,1000);
+			});
+			$lfr_nodes.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_nodes,'网络节点数目',"info",true,1000);
+			});
+			$lfr_ave_de.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_ave_de,'节点平均度',"info",true,1000);
+			});
+			$lfr_max_de.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_max_de,'节点最大度',"info",true,1000);
+			});
+			$lfr_node_di.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_node_di,'节点分布指数',"info",true,1000);
+			});
+			$lfr_com_di.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_com_di,'社团分布指数',"info",true,1000);
+			});
+			$lfr_mix_param.focus(function(event) {
+				/* Act on the event */
+				$.mylog.log($lfr_mix_param,'社团汇合指数',"info",true,1000);
+			});
+			//是否lfr数据集
+			$dataset_select.change(function(event){
+				if($dataset_select.val() == 0)
+				{
+					$("#lfr_params").addClass("in");
+				}
+				else
+				{
+					$("#lfr_params").removeClass("in");
+				}
+			});
+			//是否gce算法
+			$algorithm.change(function(event){
+				if($dataset_select.val() == 0)
+				{
+					$("#gce_params").addClass("in");
+				}
+				else
+				{
+					$("#gce_params").removeClass("in");
+				}
 			});
 			//表单验证
-			$(".params-submit").click(function(){
-				let dataset_type = $form_radio.val();
+			let nodes = [];
+			let links = [];
+			let dataset_type;
+			$("#algorithm_btn").click(function(){
 				let algorithm = $algorithm.val();
-				let gce_k = $gce_k.val();
-				let gce_alpha = $gce_alpha.val();
-				let gce_e = $gce_e.val();
-				let gce_seed_e = $gce_seed_e.val();
-				let algorithm_params = [gce_k,gce_alpha,gce_e];
-				if(dataset_type == 0)
+				// let algorithm_params = [gce_k,gce_alpha,gce_e];
+				// if(dataset_type == 0)
 				{
+					let gce_k = $gce_k.val();
+					let gce_alpha = $gce_alpha.val();
+					let gce_e = $gce_e.val();
+					let gce_seed_e = $gce_seed_e.val();
 					if(Object.is(+gce_k,0))
 					{
 						$.mylog.log($gce_k,'必须输入一个数字',"danger",true,1000);
@@ -165,22 +241,131 @@
 					let settings = {
 					  "async": true,
 					  "crossDomain": true,
-					  "url": "http://192.168.30.61:8080/gceDem/getDataServlet",
+					  "url": GL.baseurl+"/gceDem/gceServlet",
 					  "method": "POST",
 					  "headers": {
-						"Content-Type": "application/json",
-						"Cache-Control": "no-cache",
+						"Content-Type": "application/x-www-form-urlencoded",
 					  },
 					  "processData": false,
 					  "data": JSON.stringify(data)
 					}
 
 					$.ajax(settings).done(function (response) {
-					  console.log(response);
+						// let nodes=[];
+						let obj = JSON.parse(response); 
+						nodes.forEach(node=>{node.gce_community = []});
+					  	obj.gce_communitys.forEach((com,i)=>{
+							com.nodes.forEach((node,index)=>{
+								// nodes[node-1].gce_community = nodes[node-1].gce_community || [];
+								nodes[node-1].gce_community.push(i);
+							});
+					  	});
+					  	console.log(nodes);
+						let gce_graph_id = "#general_graph";
+						let original_graph_id = "#original_graph";
+						draw(gce_graph_id,nodes,links,"gce_community");
 					});
+				
 				}
-				$(".body").addClass("in");
+			});
+			$("#dataset_btn").click(function(){
+				dataset_type = +$form_radio.val();
+				let dataset = $dataset_select.val();
+				let algorithm = $algorithm.val();
+				let gce_k = $gce_k.val();
+				let gce_alpha = $gce_alpha.val();
+				let gce_e = $gce_e.val();
+				let gce_seed_e = $gce_seed_e.val();
+				let algorithm_params = [gce_k,gce_alpha,gce_e];
+				if(dataset_type == 0)
+				{
+					if(dataset == 0)//lfr数据
+					{
+						var lfr_nodes = $lfr_nodes.val(),
+							lfr_ave_de = $lfr_ave_de.val(),
+							lfr_max_de = $lfr_max_de.val(),
+							lfr_node_di = $lfr_node_di.val(),
+							lfr_com_di = $lfr_com_di.val(),
+							lfr_mix_param = $lfr_mix_param.val(),
+							dataset_params = [+lfr_nodes,+lfr_ave_de,+lfr_max_de,+lfr_node_di,+lfr_com_di,+lfr_mix_param];
+						if(Object.is(+lfr_nodes,NaN))
+						{
+							$.mylog.log($lfr_nodes,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+						if(Object.is(+lfr_ave_de,NaN))
+						{
+							$.mylog.log($lfr_ave_de,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+						if(Object.is(+lfr_max_de,NaN))
+						{
+							$.mylog.log($lfr_max_de,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+						if(Object.is(+lfr_node_di,NaN))
+						{
+							$.mylog.log($lfr_node_di,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+						if(Object.is(+lfr_com_di,NaN))
+						{
+							$.mylog.log($lfr_com_di,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+						if(Object.is(+lfr_mix_param,NaN))
+						{
+							$.mylog.log($lfr_mix_param,'必须输入一个数字',"danger",true,1000);
+							return false;
+						}
+					}
+				}
+				else
+				{
+					//上传文件数据
+				}
+				let data = {"data_type":dataset_type,"dataset_params":dataset_params};
+				let settings = {
+				  "async": true,
+				  "crossDomain": true,
+				  "url": GL.baseurl+"/gceDem/getDataServlet",
+				  "method": "POST",
+				  "headers": {
+					"Content-Type": "application/x-www-form-urlencoded",
+				  },
+				  "processData": false,
+				  "data": JSON.stringify(data)
+				}
+
+				$.ajax(settings).done(function (response) {
+					// let nodes=[];
+					let obj = JSON.parse(response); 
+				  	let nodesobj=obj.nodes;
+				  	let community = obj.communitys;
+				  	nodes = [];
+				  	links = [];
+				  	community.forEach((com,i)=>{
+						com.nodes.forEach((node,index)=>{
+							if(typeof +nodes[node] == 'number')
+								nodes[node-1] = {"name":node-1,"community":[i]};
+							else
+								nodes[node-1].community.push(i);
+						});
+				  	});
+				  	console.log(nodes);
+				  	links=obj.edges;
+					let gce_graph_id = "#general_graph";
+					let original_graph_id = "#original_graph";
+					draw(original_graph_id,nodes,links,"community");
+				});
 			});
 		});
+		$("#start_btn").click(function(event){
+			$(".body").addClass("in");
+			$("#dataset_btn").click();
+			setTimeout(function(){
+				$("#algorithm_btn").click();
+			},500);
+		});		
 	</script>
 </html>

@@ -1,2 +1,2 @@
 window.GL = {};
-GL.baseurl = "http://192.168.60.31";
+GL.baseurl = "http://localhost:8080";

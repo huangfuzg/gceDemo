@@ -79,10 +79,10 @@ body
 }
 .body.in .params-submit
 {
-	width: 60px;
+	width: auto;
 	height: 30px;
 	vertical-align: middle;
-	margin: 0 30px;
+	margin: 0 10px;
 	display: inline-block;
 }
 .params-form
@@ -100,9 +100,19 @@ body
 	margin-bottom: 0;
 	display: inline-block;
 }
+.body.in .params-items
+{
+	text-align: center;
+	margin-bottom: 0;
+	display: inline-block;
+}
+.body.in .params-items+.params-items
+{
+	margin-top: 10px;
+}
 .body.in .params-item+.params-item
 {
-	margin-left: 100px; 
+	margin-left: 20px; 
 }
 .body.in .params-header
 {
@@ -181,4 +191,38 @@ input.dange
 .body.in .radio-hand
 {
 	float: none;
+}
+#dataset_btn,#algorithm_btn,.body.in #start_btn
+{
+	display: none;
+}
+.body.in #dataset_btn,.body.in #algorithm_btn
+{
+	display: inline-block;
+}
+.collapse
+{
+	display: none;
+	height: 0;
+	transition: .5s;
+}
+.collapse.in
+{
+	display: inherit;
+	height: inherit;
+	transition: .5s;
+}
+.body.in .collapse
+{
+	display: none;
+	height: inherit;
+	width: 0;
+	transition: 1s;
+}
+.body.in .collapse.in
+{
+	display: inherit;
+	width: inherit;
+	height: inherit;
+	transition: 1s;
 }
