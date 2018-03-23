@@ -140,6 +140,7 @@ body
 {
 	width: 45%;
 	background-color: rgb(32,32,32);
+	position: relative;
 	text-align: center;
 	display: inline-block;
 	height: 772px;
@@ -226,3 +227,92 @@ input.dange
 	height: inherit;
 	transition: 1s;
 }
+.menu
+{
+	background-color: transparent;
+	width: 200px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	position: absolute;
+}
+.menu .menu-head
+{
+	background-color: rgb(39,72,68);
+	padding: 5px;
+	border: 1px solid rgb(30,50,64);	
+	text-align: center;
+	margin: -1px;
+}
+.menu .menu-title
+{	
+	font-size: 1.2em;
+}
+ul.menu-body
+{
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+ul.menu-body>li
+{
+	text-align: center;
+	display: block;
+	line-height: 2.0em;
+	background-color: white;
+	margin-top: 3px;
+}
+ul.menu-body>li:hover
+{
+	background-color: rgb(23,44,60);
+	transition: .5s;
+}
+ul.menu-body>li>a
+{
+	display: block;
+	text-decoration: none;
+	color: black;
+}
+ul.menu-body>li:hover>a
+{
+	color: white;
+	transition: .5s;
+}
+.back-btn
+{
+	display: block;
+	padding: 2px 5px;
+	cursor: pointer;
+}
+#nmi_num
+{
+	position: absolute;
+	right:20px;
+}
+#num
+{
+	color:#00ff00;
+}
+#num .num
+{
+	width: 20px;
+  	height: 20px;
+ 	position: relative;
+  	display: inline-block;
+  	overflow: hidden;
+}
+#num span
+{
+	display: inline-block;
+  	line-height: 20px;
+  	text-align: center;
+  	overflow: hidden;
+}  
+#num span i
+{
+	width: 20px;
+    height: 20px;
+    display: block;
+    text-align: center;
+    font-style: normal;
+}
+    

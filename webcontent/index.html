@@ -3,7 +3,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>community detection</title>
-		<link href="https://www.google.com/images/branding/product/ico/googleg_lodp.ico" rel="shortcut icon">
+		<link href="./imgs/community.png" rel="shortcut icon">
 		<link rel="stylesheet" href="./css/style.css">
 	</head>
 	<body>
@@ -68,27 +68,50 @@
 				</section>
 			</article>
 			<article class="content">
-				<section class="graph" style="height: 800px">
+				<section class="graph">
 					<h1>原始图形</h1>
-					<svg id="original_graph" style="width: 100%; height: 100%;"></svg>
+					<svg id="original_graph" style="width: 100%; height: 800px; display: block;"></svg>
 				</section>
-				<section class="graph" style="height: 800px">
+				<section class="graph">
 					<h1>GCE生成图形</h1>
-					<svg id="general_graph" style="width: 100%; height: 100%;"></svg>
+					<div id="nmi_num">
+						<b>NMI:</b> <b id="num" style="vertical-align: middle;"></b>
+					</div>
+					<svg id="general_graph" style="width: 100%; height: 800px; display: block;"></svg>
 				</section>
 			</article>
+			<div class="menu" style="top:0;display: none">
+				<div class="menu-head">
+					<span class="back-btn" style="float: left;" onclick="backMenu()"><b>&lt;</b></span>
+					<span class="menu-title">菜单</span>
+				</div>
+				<ul class="menu-body">
+					<li><a href="javascript:showInfo();">节点属性</a></li>
+					<li><a href="javascript:showCommunity();">所在社团</a></li>
+					<li><a href="javascript:responseCommunity();">生成对比</a></li>
+					<li><a href="javascript:drawCommunities();">所有社团</a></li>
+					<li><a href="javascript:drawAllCommunities();">所有对比</a></li>
+					<li><a href="javascript:cleanAllCommunities();">清除所有</a></li>
+				</ul>
+			</div>
 		</div>
 		<footer class="page-footer">
-			&copy;copyright 农春崯 and 皇甫
+			copyright&copy; 农春崯  皇甫志刚
 		</footer>
 	</body>
 	<script src="./plugins/jQuery/jquery-3.1.1.js"></script>
-	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script src="./plugins/d3/d3.min.js"></script>
 	<script src="config.js"></script>
 	<script src="./plugins/jquery_info.js"></script>
 	<script src="./plugins/jquery_log.js"></script>
 	<script src="./js/draw-graph.js"></script>
+	<script src="./js/nmi.js"></script>
+	<script src="./js/num.js"></script>
 	<script>
+		let nodes = [];
+		let links = [];
+		let dataset_type;
+		let sim,o_communities,g_communities;
 		$(function(){
 			let $form = $("#params-form");
 			//单选框特效
@@ -205,9 +228,6 @@
 				}
 			});
 			//表单验证
-			let nodes = [];
-			let links = [];
-			let dataset_type;
 			$("#algorithm_btn").click(function(){
 				let algorithm = $algorithm.val();
 				// let algorithm_params = [gce_k,gce_alpha,gce_e];
@@ -264,6 +284,13 @@
 						let gce_graph_id = "#general_graph";
 						let original_graph_id = "#original_graph";
 						draw(gce_graph_id,nodes,links,"gce_community");
+						// setTimeout(()=>{g_communities=circleGceCommunity(gce_graph_id,nodes),correspondingCommunity(o_communities,g_communities,sim);},11000);
+						sim = similarityCommunity(nodes);
+						o_communities = circleCommunity(gce_graph_id,nodes);
+						g_communities = circleGceCommunity(original_graph_id,nodes);
+						let nmi = NMI(Array.from(o_communities.values()).map(com=>com.nodes),Array.from(g_communities.values()).map(com=>com.nodes));
+						play(+nmi,6);
+
 					});
 				
 				}
@@ -357,6 +384,7 @@
 					let gce_graph_id = "#general_graph";
 					let original_graph_id = "#original_graph";
 					draw(original_graph_id,nodes,links,"community");
+					// setTimeout(()=>o_communities=circleCommunity(original_graph_id,nodes),11000);
 				});
 			});
 		});
@@ -365,7 +393,155 @@
 			$("#dataset_btn").click();
 			setTimeout(function(){
 				$("#algorithm_btn").click();
-			},500);
-		});		
+			},1500);
+		});
+
+		//操作菜单
+		$(".back-btn").hide();
+		$(".menu").hide();
+		$(".menu").click((ev)=>{ev.stopPropagation();});	
+		$("body").click(()=>$(".menu").hide());
+
+		//显示所有对比社团
+		function drawAllCommunities()
+		{
+			o_communities=circleCommunity("#original_graph",nodes);
+			drawEclipe("#original_graph",o_communities);
+			g_communities=circleGceCommunity("#general_graph",nodes);
+			drawEclipe("#general_graph",g_communities);
+			let svg1 = d3.select("#general_graph");
+			let svg2 = d3.select("#original_graph");
+			svg1.selectAll(".ellipse").style("stroke-width","1px");
+			svg1.selectAll(".comlable").style("fill", "rgba(255,255,255,1)");
+			svg2.selectAll(".ellipse").style("stroke-width","1px");
+			svg2.selectAll(".comlable").style("fill", "rgba(255,255,255,1)");
+		}
+		//清除所有社团
+		function cleanAllCommunities()
+		{
+			let svg1 = d3.select("#general_graph");
+			let svg2 = d3.select("#original_graph");
+			svg1.selectAll("ellipse").style("stroke-width","0");
+			svg1.selectAll(".comlable").style("fill", "rgba(255,255,255,0)");
+			svg2.selectAll("ellipse").style("stroke-width","0");
+			svg2.selectAll(".comlable").style("fill", "rgba(255,255,255,0)");
+		}
+		//显示所有社团
+		function drawCommunities()
+		{
+			let info = $(".menu").data("nodeinfo");
+			let svg;
+			if(info.type == "community")
+			{
+				svg = d3.select("#original_graph");
+				o_communities=circleCommunity("#original_graph",nodes);
+				drawEclipe("#original_graph",o_communities);
+			}
+			else if(info.type == "gce_community")
+			{
+				svg = d3.select("#general_graph");
+				g_communities=circleGceCommunity("#general_graph",nodes);
+				drawEclipe("#general_graph",g_communities);
+			}
+			svg.selectAll("ellipse").style("stroke-width","1px");
+			svg.selectAll(".comlable").style("fill", "rgba(255,255,255,1)");
+		}
+		//所在社团
+		function showCommunity()
+		{
+			let info = $(".menu").data("nodeinfo");
+			console.log(info);
+			let communities;
+			let svg;
+			if(info.type == "community")
+			{
+				communities = info.node.community;
+				svg = d3.select("#original_graph");
+				o_communities=circleCommunity("#original_graph",nodes);
+				drawEclipe("#original_graph",o_communities);
+			}
+			else if(info.type == "gce_community")
+			{
+				communities = info.node.gce_community;
+				svg = d3.select("#general_graph");
+				g_communities=circleGceCommunity("#general_graph",nodes);
+				drawEclipe("#general_graph",g_communities);
+			}
+			svg.selectAll("ellipse").style("stroke-width",(d,i)=>{
+				let ret = 0;
+				communities.forEach(com=>{
+					if(com == d.id)
+						ret = 1;
+				});
+				return ret;
+			});
+			svg.selectAll(".comlable").style("fill",(d,i)=>{
+				let ret = "rgba(255,255,255,0)";
+				communities.forEach(com=>{
+					if(com == d.id)
+						ret = "rgba(255,255,255,1)";
+				});
+				return ret;
+			});
+		}
+		//生成对比
+		function responseCommunity()
+		{
+			let info = $(".menu").data("nodeinfo");
+			o_communities=circleCommunity("#original_graph",nodes);
+			drawEclipe("#original_graph",o_communities);
+			g_communities=circleGceCommunity("#general_graph",nodes);
+			drawEclipe("#general_graph",g_communities);
+			correspondingCommunity(o_communities,g_communities,sim);
+			let communities;
+			let svg;
+			let allCommunities;
+			if(info.type == "community")
+			{
+				communities = info.node.community;
+				svg = d3.select("#general_graph");
+				allCommunities = o_communities;
+			}
+			else if(info.type == "gce_community")
+			{
+				communities = info.node.gce_community;
+				svg = d3.select("#original_graph");
+				allCommunities = g_communities;
+			}
+			svg.selectAll("ellipse").style("stroke-width",(d,i)=>{
+				let ret = 0;
+				communities.forEach(com=>{
+					if(allCommunities.get(com).respondCom == d.id)
+						ret = 1;
+				});
+				return ret;
+			});
+			svg.selectAll(".comlable").style("fill",(d,i)=>{
+				let ret = "rgba(255,255,255,0)";
+				communities.forEach(com=>{
+					if(allCommunities.get(com).respondCom == d.id)
+						ret = "rgba(255,255,255,1)";
+				});
+				return ret;
+			});
+		}
+		//节点信息
+		function showInfo()
+		{
+			let info = $(".menu").data("nodeinfo");
+			let p = $("<p style='background-color:#000;line-height:1.8em;margin:-1px;padding:10px;'></p>");
+			p.html("id："+info.nodeid+"<br>"+"所属社团："+info.node.community+"<br>"+"算法生成社团："+info.node.gce_community);
+			$(".menu-title").text("节点属性");
+			$(".menu-body").html(p);
+			$(".back-btn").show();
+		}
+		//返回按钮
+		function backMenu()
+		{
+			let menu = $("<ul class='menu-body'><li><a href='javascript:showInfo();'>节点属性</a></li><li><a href='javascript:showCommunity();'>所在社团</a></li><li><a href='javascript:responseCommunity();'>生成对比</a></li><li><a href='javascript:drawCommunities();'>所有社团</a></li><li><a href='javascript:drawAllCommunities();'>所有对比</a></li><li><a href='javascript:cleanAllCommunities();'>清除所有</a></li></ul>");
+			$(".menu-title").text("菜单");
+			$(".menu-body").html(menu);
+			$(".back-btn").hide();
+		}
 	</script>
 </html>

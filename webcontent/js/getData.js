@@ -1,0 +1,4 @@
+void valate_form()
+{
+	
+}
